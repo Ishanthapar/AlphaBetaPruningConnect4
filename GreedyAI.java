@@ -79,7 +79,7 @@ public class GreedyAI extends AIModule
     {
         if(depth == maxDepth || state.isGameOver()) {
             int x = lastMoveX;
-            int z = getBoardScore(state);
+            double z = getBoardScore(state);
 //            if(z == -1)
 //                System.out.print("returning -1 at max depth here");
             return new moveAndScore(this.lastMoveX, getBoardScore(state));
@@ -159,13 +159,13 @@ public class GreedyAI extends AIModule
 //        return new moveAndScore(bestMoveX, bestScore * 0.95);
     }
     // Unlike previous function, gets score by looping through entire board
-    private int getBoardScore(final GameStateModule state)
+    private double getBoardScore(final GameStateModule state)
     {
-        int tempScore = 0;
-        int rightScore = 0;
-        int upScore = 0;
-        int upRightScore = 0;
-        int upLeftScore = 0;
+        double tempScore = 0;
+        double rightScore = 0;
+        double upScore = 0;
+        double upRightScore = 0;
+        double upLeftScore = 0;
         // Look right
         for(int i = 0; i < gameWidth - 3; i++)
         {
@@ -214,7 +214,7 @@ public class GreedyAI extends AIModule
     }
 
     // Gets score of the player in a certain direction - left, right, down, diagonals, also checks for wins
-    private int scoreInDirection(final GameStateModule state,
+    private double scoreInDirection(final GameStateModule state,
                                  final int startingX,
                                  final int startingY,
                                  final int dX,
@@ -229,11 +229,11 @@ public class GreedyAI extends AIModule
         for(int i = 0, x = startingX, y = startingY; i < 4 && x >= 0 && x < gameWidth
                 && y >= 0 && y < gameHeight; i++, x += dX, y += dY)
         {
-            if(startingX == 4)
-            {
-                // This was just here for debugging, ignore
-                int p = 1;
-            }
+//            if(startingX == 4)
+//            {
+//                // This was just here for debugging, ignore
+//                int p = 1;
+//            }
             if(state.getAt(x, y) == ourPlayer)
                 ourScore++;
             else if(state.getAt(x,y) == opponentPlayer) {
@@ -243,26 +243,32 @@ public class GreedyAI extends AIModule
                 opponentScore++;
             }
         }
-
-
+        int totalScore = 0;
         // if 4 of same tile, return the winningScore instead.
         if(opponentScore == 4)
             return -winningScore;
-        return ourScore == 4 ? winningScore : ourScore;
+        if(ourScore == 4)
+        return winningScore;
+        if(ourScore == 3)
+            return ourScore * 10;
+        if(ourScore == 2)
+            return ourScore * 2;
+        return ourScore;
     }
 
     /* Adds up # tiles in all directions from a specific move
        Ex: Make potential move at (1,1) - count how many of our tiles you can reach from 1,1
       */
-    private int getScoreAtMove(final GameStateModule state)
+    private double getScoreAtMove(final GameStateModule state)
     {
-        int leftScore = scoreInDirection(state, this.lastMoveX, this.lastMoveY, -1, 0);
-        int rightScore = scoreInDirection(state, this.lastMoveX, this.lastMoveY, 1, 0);
-        int upLeftScore = scoreInDirection(state, this.lastMoveX, this.lastMoveY, -1, 1);
-        int upRightScore = scoreInDirection(state, this.lastMoveX, this.lastMoveY, 1, 1);
-        int downLeftScore = scoreInDirection(state, this.lastMoveX, this.lastMoveY, -1, -1);
-        int downRightScore = scoreInDirection(state, this.lastMoveX, this.lastMoveY, 1, -1);
-        int downScore = scoreInDirection(state, this.lastMoveX, this.lastMoveY, 0, -1);
+        double leftScore = scoreInDirection(state, this.lastMoveX, this.lastMoveY, -1, 0);
+        double rightScore = scoreInDirection(state, this.lastMoveX, this.lastMoveY, 1, 0);
+        double upLeftScore = scoreInDirection(state, this.lastMoveX, this.lastMoveY, -1, 1);
+        double upRightScore = scoreInDirection(state, this.lastMoveX, this.lastMoveY, 1, 1);
+        double downLeftScore = scoreInDirection(state, this.lastMoveX, this.lastMoveY, -1, -1);
+        double downRightScore = scoreInDirection(state, this.lastMoveX, this.lastMoveY, 1, -1);
+        double downScore = scoreInDirection(state, this.lastMoveX, this.lastMoveY, 0, -1);
+
 
         /* Because the current tile is placed by the same player, the order of the below 2 shouldnt matter -
            if max, we can only win, and if min, we cna only lose.
@@ -277,7 +283,7 @@ public class GreedyAI extends AIModule
             return -winningScore;
 
         // Note: Kind of bugged because we get default score of 7 because we count the same tile 7 times.
-        int totalScore = leftScore + rightScore + upLeftScore + upRightScore + downLeftScore + downRightScore
+        double totalScore = leftScore + rightScore + upLeftScore + upRightScore + downLeftScore + downRightScore
                 + downScore;
 
         return totalScore;
