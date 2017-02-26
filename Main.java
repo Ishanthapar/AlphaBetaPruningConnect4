@@ -7,6 +7,7 @@ import javax.swing.*;
  * information.
  * 
  * @author Leonid Shamis
+
  */
 public class Main
 {
@@ -38,6 +39,7 @@ public class Main
 
 		// Default max ai time is 500 ms
 		int AI_time = 500;
+//		int AI_time = 500000;
 		// Default width to 7
 		int width = 7;
 		// Default height to 6
