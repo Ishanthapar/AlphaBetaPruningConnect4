@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.TreeMap;
 // Unoptimized works better than 'OptimizedAI.java'
 /**
@@ -88,13 +89,29 @@ public class samir_alphabetaAI extends AIModule
 //            return new moveAndScore(this.lastMoveX, getScoreAtMove(state));
         }
 
+        /*
+        http://stackoverflow.com/questions/9964496/alpha-beta-move-ordering
+        At every depth, sort the moves based on score. By default, the TreeMap sorts least -> greatest
+        For min function, you'd like to process smallest (min) moves first and see if you can prune from there.
+        For max, you'd like to process largest moves (max) first and see if you can prune.
+        */
         ArrayList<Integer> moves = generateMoves(state);
-//        TreeMap<Double, Double> sortedMoves = new TreeMap<Double, Double>();
-//        for(move : moves)
-//        {
-//
-//        }
+        TreeMap<Double, Double> sortedMoveMap = new TreeMap<Double, Double>();
+        for(int move : moves)
+        {
+            state.makeMove(move);
+            double score = getBoardScore(state);
+            sortedMoveMap.put(score, (double) move);
+            state.unMakeMove();
+        }
 
+        ArrayList<Integer> sortedMoves = new ArrayList<Integer>();
+
+        for(double move : sortedMoveMap.values())
+            sortedMoves.add((int) move);
+        // Reverse so it goes from greatest to least
+        if(isMaxFunction)
+            Collections.reverse(sortedMoves);
 
         // Store the move used before this temporarily to go back to.
         int tempLastMoveX = this.lastMoveX;
@@ -105,7 +122,7 @@ public class samir_alphabetaAI extends AIModule
 //        int bestScore =
         if(depth == 2)
             beta += 0;
-        for(int move : moves)
+        for(int move : sortedMoves)
         {
             if(terminate)
                 break;
