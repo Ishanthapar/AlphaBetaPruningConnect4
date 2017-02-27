@@ -5,7 +5,7 @@ import java.util.ArrayList;
  */
 
 
-public class GreedyAI extends AIModule
+public class OptimizedAI extends AIModule
 {
     /* A short class that allows us to pass back the score as well as where we make the move.in min/max
        game tree
@@ -26,7 +26,7 @@ public class GreedyAI extends AIModule
     private static int maxDepth = 6;
     // If any potential move can win the game, give it this value.
     private static int winningScore = 10000;
-//    private static int winningScore = Integer.MAX_VALUE / 2;
+    //    private static int winningScore = Integer.MAX_VALUE / 2;
     private static boolean useMaxFunction = true;
     private static boolean useMinFunction = false;
 
@@ -43,22 +43,22 @@ public class GreedyAI extends AIModule
         ArrayList<Integer> moves = generateMoves(state);
 //        chosenMove = pickBestMove(state, moves);
 
-            ourPlayer = state.getActivePlayer();
-            opponentPlayer = ourPlayer == 1 ? 2 : 1;
+        ourPlayer = state.getActivePlayer();
+        opponentPlayer = ourPlayer == 1 ? 2 : 1;
 //            parentScore = 0;
-            // Our first move, pick col 3 by default, but if it has been picked, pick col 4.
-            if (state.getCoins() < 2) {
-                chosenMove = state.getHeightAt(3) == 0 ? 3 : 4;
-                return;
-            }
+        // Our first move, pick col 3 by default, but if it has been picked, pick col 4.
+        if (state.getCoins() < 2) {
+            chosenMove = state.getHeightAt(3) == 0 ? 3 : 4;
+            return;
+        }
 
-            // object that stores best move and its score
-            moveAndScore nextMoveScore = minMax(state, 1, useMaxFunction);
+        // object that stores best move and its score
+        moveAndScore nextMoveScore = minMax(state, 1, useMaxFunction);
 //            parentScore += nextMoveScore.score;
 
-            lastMoveX = nextMoveScore.move;
-            lastMoveY = state.getHeightAt(nextMoveScore.move);
-            chosenMove = nextMoveScore.move;
+        lastMoveX = nextMoveScore.move;
+        lastMoveY = state.getHeightAt(nextMoveScore.move);
+        chosenMove = nextMoveScore.move;
     }
 
     private ArrayList<Integer> generateMoves(final GameStateModule state)
@@ -82,7 +82,7 @@ public class GreedyAI extends AIModule
             double z = getBoardScore(state);
 //            if(z == -1)
 //                System.out.print("returning -1 at max depth here");
-            return new moveAndScore(this.lastMoveX, getBoardScore(state));
+            return new moveAndScore(this.lastMoveX, getBoardScore(state) * .99 * depth);
 //            return new moveAndScore(this.lastMoveX, getScoreAtMove(state));
         }
 
@@ -215,10 +215,10 @@ public class GreedyAI extends AIModule
 
     // Gets score of the player in a certain direction - left, right, down, diagonals, also checks for wins
     private double scoreInDirection(final GameStateModule state,
-                                 final int startingX,
-                                 final int startingY,
-                                 final int dX,
-                                 final int dY
+                                    final int startingX,
+                                    final int startingY,
+                                    final int dX,
+                                    final int dY
     )
     {
         int ourScore = 0;
@@ -248,12 +248,21 @@ public class GreedyAI extends AIModule
         if(opponentScore == 4)
             return -winningScore;
         if(ourScore == 4)
-        return winningScore;
+            return winningScore;
+
         if(ourScore == 3)
             return ourScore * 10;
+//            totalScore += ourScore * 10;
+//        if(opponentScore == 3)
+////            totalScore -= opponentScore;
+//            return 0;
         if(ourScore == 2)
+//            totalScore += ourScore * 2;
             return ourScore * 2;
+//        if(opponentScore == 2)
+//            totalScore -= opponentScore * 2;
         return ourScore;
+//        return totalScore;
     }
 
     /* Adds up # tiles in all directions from a specific move
