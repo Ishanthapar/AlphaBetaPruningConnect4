@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-
+// For some reason this one doesn't work as well as OptimizedAI2
 /**
  * Created by Samir Rahman on 2/20/2017.
  */
@@ -82,7 +82,7 @@ public class OptimizedAI extends AIModule
             double z = getBoardScore(state);
 //            if(z == -1)
 //                System.out.print("returning -1 at max depth here");
-            return new moveAndScore(this.lastMoveX, getBoardScore(state) * .99 * depth);
+            return new moveAndScore(this.lastMoveX, getBoardScore(state) * Math.pow(.8, depth));
 //            return new moveAndScore(this.lastMoveX, getScoreAtMove(state));
         }
 
@@ -250,15 +250,15 @@ public class OptimizedAI extends AIModule
         if(ourScore == 4)
             return winningScore;
 
-        if(ourScore == 3)
-            return ourScore * 10;
-//            totalScore += ourScore * 10;
-//        if(opponentScore == 3)
-////            totalScore -= opponentScore;
-//            return 0;
-        if(ourScore == 2)
-//            totalScore += ourScore * 2;
-            return ourScore * 2;
+//        if(ourScore == 3)
+//            return ourScore * 10;
+////            totalScore += ourScore * 10;
+////        if(opponentScore == 3)
+//////            totalScore -= opponentScore;
+////            return 0;
+//        if(ourScore == 2)
+////            totalScore += ourScore * 2;
+//            return ourScore * 2;
 //        if(opponentScore == 2)
 //            totalScore -= opponentScore * 2;
         return ourScore;

@@ -1,11 +1,11 @@
 import java.util.ArrayList;
-// Unoptimized works better than 'OptimizedAI.java'
+// This is the best one
 /**
  * Created by Samir Rahman on 2/20/2017.
  */
 
 
-public class UnoptimizedAI extends AIModule
+public class OptimizedAI2 extends AIModule
 {
     /* A short class that allows us to pass back the score as well as where we make the move.in min/max
        game tree
@@ -83,7 +83,7 @@ public class UnoptimizedAI extends AIModule
             int z = getBoardScore(state);
 //            if(z == -1)
 //                System.out.print("returning -1 at max depth here");
-            return new moveAndScore(this.lastMoveX, getBoardScore(state));
+            return new moveAndScore(this.lastMoveX, getBoardScore(state) * Math.pow(.85 ,depth));
 //            return new moveAndScore(this.lastMoveX, getScoreAtMove(state));
         }
 
@@ -249,7 +249,12 @@ public class UnoptimizedAI extends AIModule
         // if 4 of same tile, return the winningScore instead.
         if(opponentScore == 4)
             return -winningScore;
-        return ourScore == 4 ? winningScore : ourScore;
+        if(ourScore == 4)
+            return winningScore;
+//        return ourScore == 4 ? winningScore : ourScore;
+        if(ourScore == 3)
+            return ourScore * 10;
+        return ourScore;
     }
 
     /* Adds up # tiles in all directions from a specific move
