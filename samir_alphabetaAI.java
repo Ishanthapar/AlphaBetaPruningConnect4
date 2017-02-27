@@ -1,9 +1,12 @@
-/**
- * Authors: Ishan Thapar, 999104208; Samir Rahman, 998988726
- */
 import java.util.ArrayList;
+import java.util.TreeMap;
+// Unoptimized works better than 'OptimizedAI.java'
+/**
+ * Created by Samir Rahman on 2/20/2017.
+ */
 
-public class AlphaBetaPruningAI extends AIModule
+
+public class samir_alphabetaAI extends AIModule
 {
     /* A short class that allows us to pass back the score as well as where we make the move.in min/max
        game tree
@@ -11,10 +14,11 @@ public class AlphaBetaPruningAI extends AIModule
     private class moveAndScore
     {
         public int move;
-        public int score;
+        public double score;
 
-        public moveAndScore(int move, int score)
+        public moveAndScore(int move, double score)
         {
+
             this.move = move;
             this.score = score;
         }
@@ -51,7 +55,7 @@ public class AlphaBetaPruningAI extends AIModule
         }
 
         // object that stores best move and its score
-        moveAndScore nextMoveScore = alphaBetaMinMax(state, 1, useMaxFunction, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        moveAndScore nextMoveScore = minMax(state, 1, useMaxFunction, Integer.MIN_VALUE, Integer.MAX_VALUE);
 //            parentScore += nextMoveScore.score;
 
         lastMoveX = nextMoveScore.move;
@@ -73,84 +77,115 @@ public class AlphaBetaPruningAI extends AIModule
     }
 
     // If minOrMax == useMaxFunction (true) take max. else, take min
-    private moveAndScore alphaBetaMinMax(final GameStateModule state, int depth, boolean isMaxFunction, int alpha, int beta)
+    private moveAndScore minMax(final GameStateModule state, int depth, boolean isMaxFunction, double alpha, double beta)
     {
         if(depth == maxDepth || state.isGameOver()) {
-            //System.out.println("Max depth reached");
             int x = lastMoveX;
             int z = getBoardScore(state);
+//            if(z == -1)
+//                System.out.print("returning -1 at max depth here");
             return new moveAndScore(this.lastMoveX, getBoardScore(state));
+//            return new moveAndScore(this.lastMoveX, getScoreAtMove(state));
         }
 
         ArrayList<Integer> moves = generateMoves(state);
+//        TreeMap<Double, Double> sortedMoves = new TreeMap<Double, Double>();
+//        for(move : moves)
+//        {
+//
+//        }
+
 
         // Store the move used before this temporarily to go back to.
         int tempLastMoveX = this.lastMoveX;
         int tempLastMoveY = this.lastMoveY;
         int bestMoveX = -1;
         // If max, have best score be small negative value, if min, use big positive value
-        int bestScore = isMaxFunction ? Integer.MIN_VALUE : Integer.MAX_VALUE;
-
-        boolean oppositeMinMax = isMaxFunction ? useMinFunction : useMaxFunction;
-
+        double bestScore = isMaxFunction ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+//        int bestScore =
+        if(depth == 2)
+            beta += 0;
         for(int move : moves)
         {
-
-            if(terminate) {
-                //System.out.println("Terminate Called");
+            if(terminate)
                 break;
-            }
-
             lastMoveX = move;
             lastMoveY = state.getHeightAt(move);
+            if(!state.canMakeMove(move))
+                System.out.print("why is this move here?");
+//            if(isMaxFunction == useMinFunction && move == 0 && lastMoveY == 0)
+//                System.out.print("why isn't this move detected?");
             state.makeMove(move);
 
+//            if(depth == 1 && state.getCoins() == 6)
+//                System.out.print("block threat here");
             // if max right now, use min next time. if min right now, use max next time.
-            //boolean oppositeMinMax = isMaxFunction ? useMinFunction : useMaxFunction;
-            moveAndScore moveScore =  alphaBetaMinMax(state, depth + 1, oppositeMinMax, alpha, beta);
-            //alpha = Math.max(alpha, moveScore.score);
-            //beta = Math.min(beta, moveScore.score);
+            boolean oppositeMinMax = isMaxFunction ? useMinFunction : useMaxFunction;
+            moveAndScore moveScore =  minMax(state, depth + 1, oppositeMinMax, alpha, beta);
+//            moveAndScore moveScore =  minMax(state, depth + 1, !isMaxFunction);
+
+//            if(moveScore.move == -1) {
+//                System.out.print("error in minmax");
+//                System.out.print(terminate);
+//            }
             if(isMaxFunction)
             {
+//                if (moveScore.score + parentScore > bestScore) {
+//                    System.out.println(moveScore.score);
+//                    bestScore = moveScore.score + parentScore;
+//                    if(bestScore > winningScore || bestScore < -winningScore) {
+//                        int z = 5;
+//                    }
+//                    bestMoveX = lastMoveX;
+//                }
                 if(moveScore.score > bestScore) {
                     bestScore = moveScore.score;
+//                    bestMoveX = moveScore.move;
                     bestMoveX = move;
+//                    System.out.println(moveScore.move);
+//                    System.out.println(moveScore.score);
                 }
-
+//
                 if(bestScore >= beta)
+                {
+                    lastMoveX = tempLastMoveX;
+                    lastMoveY = tempLastMoveY;
+                    state.unMakeMove();
                     return new moveAndScore(bestMoveX, bestScore);
+                }
                 alpha = Math.max(alpha, bestScore);
-
-                /*alpha = Math.max(alpha, bestScore);
-                if (beta >= alpha){
-                    System.out.println("Pruning branch");
-                    break;
-                }*/
 
             }
             else // min func
             {
+//                if(moveScore.score + parentScore < bestScore)
+//                {
+//                    bestScore = moveScore.score + parentScore;
+//                    bestMoveX = lastMoveX;
+//                }
                 if(moveScore.score < bestScore) {
                     bestScore = moveScore.score;
+//                    bestMoveX = moveScore.move;
                     bestMoveX = move;
                 }
 
-                if(bestScore <= alpha)
+                if(bestScore <= alpha) {
+                    lastMoveX = tempLastMoveX;
+                    lastMoveY = tempLastMoveY;
+                    state.unMakeMove();
                     return new moveAndScore(bestMoveX, bestScore);
+                }
                 beta = Math.min(beta, bestScore);
-
-                /*beta = Math.min(beta, bestScore);
-                if (beta >= alpha){
-                    System.out.println("Pruning branch");
-                    break;
-                }*/
             }
 
             lastMoveX = tempLastMoveX;
             lastMoveY = tempLastMoveY;
             state.unMakeMove();
         }
+//        if(bestScore == -1 || bestScore == Integer.MIN_VALUE)
+//            System.out.print("returning -1 or min value at end of minmax");
         return new moveAndScore(bestMoveX, bestScore);
+//        return new moveAndScore(bestMoveX, bestScore * 0.95);
     }
     // Unlike previous function, gets score by looping through entire board
     private int getBoardScore(final GameStateModule state)
