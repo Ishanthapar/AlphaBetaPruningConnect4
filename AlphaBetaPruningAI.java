@@ -116,6 +116,11 @@ public class AlphaBetaPruningAI extends AIModule
                     bestScore = moveScore.score;
                     bestMoveX = move;
                 }
+
+                if(bestScore >= beta)
+                    return new moveAndScore(bestMoveX, bestScore);
+                alpha = Math.max(alpha, bestScore);
+
                 /*alpha = Math.max(alpha, bestScore);
                 if (beta >= alpha){
                     System.out.println("Pruning branch");
@@ -129,6 +134,11 @@ public class AlphaBetaPruningAI extends AIModule
                     bestScore = moveScore.score;
                     bestMoveX = move;
                 }
+
+                if(bestScore <= alpha)
+                    return new moveAndScore(bestMoveX, bestScore);
+                beta = Math.min(beta, bestScore);
+
                 /*beta = Math.min(beta, bestScore);
                 if (beta >= alpha){
                     System.out.println("Pruning branch");
