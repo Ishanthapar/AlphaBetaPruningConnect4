@@ -1,11 +1,11 @@
 import java.util.ArrayList;
-
+// Unoptimized works better than 'OptimizedAI.java'
 /**
  * Created by Samir Rahman on 2/20/2017.
  */
 
 
-public class GreedyAI extends AIModule
+public class UnoptimizedAI extends AIModule
 {
     /* A short class that allows us to pass back the score as well as where we make the move.in min/max
        game tree
@@ -17,6 +17,7 @@ public class GreedyAI extends AIModule
 
         public moveAndScore(int move, double score)
         {
+
             this.move = move;
             this.score = score;
         }
@@ -26,7 +27,7 @@ public class GreedyAI extends AIModule
     private static int maxDepth = 6;
     // If any potential move can win the game, give it this value.
     private static int winningScore = 10000;
-//    private static int winningScore = Integer.MAX_VALUE / 2;
+    //    private static int winningScore = Integer.MAX_VALUE / 2;
     private static boolean useMaxFunction = true;
     private static boolean useMinFunction = false;
 
@@ -43,22 +44,22 @@ public class GreedyAI extends AIModule
         ArrayList<Integer> moves = generateMoves(state);
 //        chosenMove = pickBestMove(state, moves);
 
-            ourPlayer = state.getActivePlayer();
-            opponentPlayer = ourPlayer == 1 ? 2 : 1;
+        ourPlayer = state.getActivePlayer();
+        opponentPlayer = ourPlayer == 1 ? 2 : 1;
 //            parentScore = 0;
-            // Our first move, pick col 3 by default, but if it has been picked, pick col 4.
-            if (state.getCoins() < 2) {
-                chosenMove = state.getHeightAt(3) == 0 ? 3 : 4;
-                return;
-            }
+        // Our first move, pick col 3 by default, but if it has been picked, pick col 4.
+        if (state.getCoins() < 2) {
+            chosenMove = state.getHeightAt(3) == 0 ? 3 : 4;
+            return;
+        }
 
-            // object that stores best move and its score
-            moveAndScore nextMoveScore = minMax(state, 1, useMaxFunction);
+        // object that stores best move and its score
+        moveAndScore nextMoveScore = minMax(state, 1, useMaxFunction);
 //            parentScore += nextMoveScore.score;
 
-            lastMoveX = nextMoveScore.move;
-            lastMoveY = state.getHeightAt(nextMoveScore.move);
-            chosenMove = nextMoveScore.move;
+        lastMoveX = nextMoveScore.move;
+        lastMoveY = state.getHeightAt(nextMoveScore.move);
+        chosenMove = nextMoveScore.move;
     }
 
     private ArrayList<Integer> generateMoves(final GameStateModule state)
