@@ -17,7 +17,6 @@ public class OptimizedAI extends AIModule
 
         public moveAndScore(int move, double score)
         {
-
             this.move = move;
             this.score = score;
         }
