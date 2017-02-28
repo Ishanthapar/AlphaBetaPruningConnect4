@@ -1,13 +1,11 @@
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.TreeMap;
-// Unoptimized works better than 'OptimizedAI.java'
+// This is the best one
 /**
  * Created by Samir Rahman on 2/20/2017.
  */
 
 
-public class samir_alphabetaAI extends AIModule
+public class OptimizedAI3 extends AIModule
 {
     /* A short class that allows us to pass back the score as well as where we make the move.in min/max
        game tree
@@ -56,7 +54,9 @@ public class samir_alphabetaAI extends AIModule
         }
 
         // object that stores best move and its score
-        moveAndScore nextMoveScore = minMax(state, 1, useMaxFunction, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        if(state.getCoins() == 16)
+            ourPlayer = ourPlayer;
+        moveAndScore nextMoveScore = minMax(state, 1, useMaxFunction);
 //            parentScore += nextMoveScore.score;
 
         lastMoveX = nextMoveScore.move;
@@ -78,40 +78,19 @@ public class samir_alphabetaAI extends AIModule
     }
 
     // If minOrMax == useMaxFunction (true) take max. else, take min
-    private moveAndScore minMax(final GameStateModule state, int depth, boolean isMaxFunction, double alpha, double beta)
+    private moveAndScore minMax(final GameStateModule state, int depth, boolean isMaxFunction)
     {
         if(depth == maxDepth || state.isGameOver()) {
             int x = lastMoveX;
             int z = getBoardScore(state);
 //            if(z == -1)
 //                System.out.print("returning -1 at max depth here");
-            return new moveAndScore(this.lastMoveX, getBoardScore(state));
+            return new moveAndScore(this.lastMoveX, getBoardScore(state) * Math.pow(0.9 ,depth));
+//            return new moveAndScore(this.lastMoveX, getBoardScore(state));
 //            return new moveAndScore(this.lastMoveX, getScoreAtMove(state));
         }
 
-        /*
-        http://stackoverflow.com/questions/9964496/alpha-beta-move-ordering
-        At every depth, sort the moves based on score. By default, the TreeMap sorts least -> greatest
-        For min function, you'd like to process smallest (min) moves first and see if you can prune from there.
-        For max, you'd like to process largest moves (max) first and see if you can prune.
-        */
         ArrayList<Integer> moves = generateMoves(state);
-        TreeMap<Double, Double> sortedMoveMap = new TreeMap<Double, Double>();
-        for(int move : moves)
-        {
-            state.makeMove(move);
-            double score = getBoardScore(state);
-            sortedMoveMap.put(score, (double) move);
-            state.unMakeMove();
-        }
-
-        ArrayList<Integer> sortedMoves = new ArrayList<Integer>();
-
-        for(double move : sortedMoveMap.values())
-            sortedMoves.add((int) move);
-        // Reverse so it goes from greatest to least
-        if(isMaxFunction)
-            Collections.reverse(sortedMoves);
 
         // Store the move used before this temporarily to go back to.
         int tempLastMoveX = this.lastMoveX;
@@ -120,17 +99,13 @@ public class samir_alphabetaAI extends AIModule
         // If max, have best score be small negative value, if min, use big positive value
         double bestScore = isMaxFunction ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 //        int bestScore =
-        if(depth == 2)
-            beta += 0;
         for(int move : moves)
-//        for(int move : sortedMoves)
         {
+
             if(terminate)
                 break;
             lastMoveX = move;
             lastMoveY = state.getHeightAt(move);
-            if(!state.canMakeMove(move))
-                System.out.print("why is this move here?");
 //            if(isMaxFunction == useMinFunction && move == 0 && lastMoveY == 0)
 //                System.out.print("why isn't this move detected?");
             state.makeMove(move);
@@ -139,7 +114,9 @@ public class samir_alphabetaAI extends AIModule
 //                System.out.print("block threat here");
             // if max right now, use min next time. if min right now, use max next time.
             boolean oppositeMinMax = isMaxFunction ? useMinFunction : useMaxFunction;
-            moveAndScore moveScore =  minMax(state, depth + 1, oppositeMinMax, alpha, beta);
+            if(state.getCoins() == 18 && depth == 2 && move == 5)
+                ourPlayer = ourPlayer;
+            moveAndScore moveScore =  minMax(state, depth + 1, oppositeMinMax);
 //            moveAndScore moveScore =  minMax(state, depth + 1, !isMaxFunction);
 
 //            if(moveScore.move == -1) {
@@ -163,16 +140,6 @@ public class samir_alphabetaAI extends AIModule
 //                    System.out.println(moveScore.move);
 //                    System.out.println(moveScore.score);
                 }
-//
-                if(bestScore >= beta)
-                {
-                    lastMoveX = tempLastMoveX;
-                    lastMoveY = tempLastMoveY;
-                    state.unMakeMove();
-                    return new moveAndScore(bestMoveX, bestScore);
-                }
-                alpha = Math.max(alpha, bestScore);
-
             }
             else // min func
             {
@@ -186,14 +153,6 @@ public class samir_alphabetaAI extends AIModule
 //                    bestMoveX = moveScore.move;
                     bestMoveX = move;
                 }
-
-                if(bestScore <= alpha) {
-                    lastMoveX = tempLastMoveX;
-                    lastMoveY = tempLastMoveY;
-                    state.unMakeMove();
-                    return new moveAndScore(bestMoveX, bestScore);
-                }
-                beta = Math.min(beta, bestScore);
             }
 
             lastMoveX = tempLastMoveX;
@@ -276,17 +235,12 @@ public class samir_alphabetaAI extends AIModule
         for(int i = 0, x = startingX, y = startingY; i < 4 && x >= 0 && x < gameWidth
                 && y >= 0 && y < gameHeight; i++, x += dX, y += dY)
         {
-            if(startingX == 4)
-            {
-                // This was just here for debugging, ignore
-                int p = 1;
-            }
             if(state.getAt(x, y) == ourPlayer)
                 ourScore++;
             else if(state.getAt(x,y) == opponentPlayer) {
                 // There is an opponent tile in the way, so not worth.
-                if(tileAtStart == ourPlayer)
-                    return 0;
+//                if(tileAtStart == ourPlayer)
+//                    return 0;
                 opponentScore++;
             }
         }
@@ -295,7 +249,24 @@ public class samir_alphabetaAI extends AIModule
         // if 4 of same tile, return the winningScore instead.
         if(opponentScore == 4)
             return -winningScore;
-        return ourScore == 4 ? winningScore : ourScore;
+        if(ourScore == 4)
+            return winningScore;
+//        return ourScore == 4 ? winningScore : ourScore;
+        int totalScore = 0;
+        if(ourScore == 3)
+            totalScore += 100;
+        if(ourScore == 2)
+            totalScore += 10;
+        if(ourScore == 1)
+            totalScore += 1;
+
+        if(opponentScore == 3)
+            totalScore -= 100;
+        if(opponentScore == 2)
+            totalScore -= 10;
+        if(opponentScore == 1)
+            totalScore -= 1;
+        return totalScore;
     }
 
     /* Adds up # tiles in all directions from a specific move
