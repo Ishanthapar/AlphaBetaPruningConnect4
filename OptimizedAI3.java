@@ -85,8 +85,8 @@ public class OptimizedAI3 extends AIModule
             int z = getBoardScore(state);
 //            if(z == -1)
 //                System.out.print("returning -1 at max depth here");
-            return new moveAndScore(this.lastMoveX, getBoardScore(state) * Math.pow(0.9 ,depth));
-//            return new moveAndScore(this.lastMoveX, getBoardScore(state));
+//            return new moveAndScore(this.lastMoveX, getBoardScore(state) * Math.pow(0.9 ,depth));
+            return new moveAndScore(this.lastMoveX, getBoardScore(state));
 //            return new moveAndScore(this.lastMoveX, getScoreAtMove(state));
         }
 
@@ -103,7 +103,13 @@ public class OptimizedAI3 extends AIModule
         {
 
             if(terminate)
+            {
+                System.out.println("too slow terminate");
+                lastMoveX = tempLastMoveX;
+                lastMoveY = tempLastMoveY;
+                state.unMakeMove();
                 break;
+            }
             lastMoveX = move;
             lastMoveY = state.getHeightAt(move);
 //            if(isMaxFunction == useMinFunction && move == 0 && lastMoveY == 0)
@@ -178,8 +184,8 @@ public class OptimizedAI3 extends AIModule
             for(int j = 0; j < gameHeight; j++)
             {
                 rightScore += scoreInDirection(state, i, j, 1, 0 );
-                if(rightScore == winningScore || rightScore == -winningScore)
-                    return rightScore;
+//                if(rightScore == winningScore || rightScore == -winningScore)
+//                    return rightScore;
             }
         }
 
@@ -189,8 +195,8 @@ public class OptimizedAI3 extends AIModule
             for(int j = 0; j < gameHeight - 3; j++)
             {
                 upScore += scoreInDirection(state, i, j, 0, 1);
-                if(upScore == winningScore || upScore == -winningScore)
-                    return upScore;
+//                if(upScore == winningScore || upScore == -winningScore)
+//                    return upScore;
 
             }
         }
@@ -200,8 +206,8 @@ public class OptimizedAI3 extends AIModule
             for(int j = 0; j < gameHeight - 3; j++)
             {
                 upRightScore += scoreInDirection(state, i, j, 1, 1);
-                if(upRightScore == winningScore || upRightScore == -winningScore)
-                    return upRightScore;
+//                if(upRightScore == winningScore || upRightScore == -winningScore)
+//                    return upRightScore;
             }
         }
 
@@ -211,8 +217,8 @@ public class OptimizedAI3 extends AIModule
             for(int j = 0; j < gameHeight - 3; j++)
             {
                 upLeftScore += scoreInDirection(state, i, j, 1, 1);
-                if(upLeftScore == winningScore || upLeftScore == -winningScore)
-                    return upLeftScore;
+//                if(upLeftScore == winningScore || upLeftScore == -winningScore)
+//                    return upLeftScore;
             }
         }
 
@@ -256,7 +262,7 @@ public class OptimizedAI3 extends AIModule
         if(ourScore == 3)
             totalScore += 100;
         if(ourScore == 2)
-            totalScore += 10;
+            totalScore += 5;
         if(ourScore == 1)
             totalScore += 1;
 
@@ -268,6 +274,8 @@ public class OptimizedAI3 extends AIModule
             totalScore -= 1;
         return totalScore;
     }
+
+
 
     /* Adds up # tiles in all directions from a specific move
        Ex: Make potential move at (1,1) - count how many of our tiles you can reach from 1,1
