@@ -219,6 +219,7 @@ public class samir_alphabetaAI extends AIModule
 //        return new moveAndScore(bestMoveX, bestScore * 0.95);
     }
     // Unlike previous function, gets score by looping through entire board
+
     private int getBoardScore(final GameStateModule state)
     {
         int tempScore = 0;
@@ -277,8 +278,8 @@ public class samir_alphabetaAI extends AIModule
     private int scoreInDirection(final GameStateModule state,
                                  final int startingX,
                                  final int startingY,
-                                 final int dX,
-                                 final int dY
+                                 final int X,
+                                 final int Y
     )
     {
         int ourScore = 0;
@@ -287,7 +288,7 @@ public class samir_alphabetaAI extends AIModule
 
         // Iterate through 4 tiles, but stop early if our x or y value goes over the bounds.
         for(int i = 0, x = startingX, y = startingY; i < 4 && x >= 0 && x < gameWidth
-                && y >= 0 && y < gameHeight; i++, x += dX, y += dY)
+                && y >= 0 && y < gameHeight; i++, x += X, y += Y)
         {
             if(startingX == 4)
             {

@@ -38,6 +38,10 @@ public class MinimaxAI extends AIModule
         int row;
         int column;
         int result = 0;
+        int threat;
+        int player1_score;
+        int player2_score;
+        int score;
         int [][] board = new int[game.getHeight()][game.getWidth()];
 
         for (int i = 0; i < game.getHeight(); i++)
@@ -63,8 +67,13 @@ public class MinimaxAI extends AIModule
 
         //System.out.println(board[6][0]);
 
+        for (int i = 0; i < game.getHeight(); i++)
+        {
+            for (int j = 0; j < game.getWidth(); j++)
+            {
 
-
+            }
+        }
 
         return 0;
     }
